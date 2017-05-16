@@ -25,7 +25,7 @@ function [classCount, classIdentity, classImage, imageDir, imageName] = fp_02_lo
             dfiles = strcat(path, dataDir(i).name);
 
             ifiles = dir(dfiles);
-            for j=1:length(ifiles)
+            for j=1:32
                 if ifiles(j).isdir == 0
                     ctr = ctr + 1;
                     
@@ -34,6 +34,7 @@ function [classCount, classIdentity, classImage, imageDir, imageName] = fp_02_lo
                     imageName = [imageName ifiles(j).name];
 
                     img = imread(imdir);
+                    img = imresize(img,[200 200]);
                     classImage = [classImage img];
 
                     classIdentity = [classIdentity i-dirnum];
