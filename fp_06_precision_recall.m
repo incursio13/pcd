@@ -1,14 +1,17 @@
-function [precision, recall] = fp_06_confmatrix(classCount, classPrediction, classActual)
+function [acc, precision, recall] = fp_06_confmatrix(count_train,classCount, classPrediction, classActual)
     len = length(classPrediction);
     
-    precision = 0.0;
+    tp = 0.0;
+    fp = 0.0;
     for i=1:len
         if classPrediction(i) == classActual
-            precision = precision + 1.0;
+            tp = tp + 1.0;
+        else
+            fp = fp + 1.0;
         end
     end
-    
+    acc = (tp+(count_train-tp-2*fp))/count_train;
 %     recall = precision / double(classCount(classActual));
-    precision = precision / double(len);
+    precision = tp / double(len);
     recall = precision;
 end
