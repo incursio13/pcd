@@ -12,19 +12,6 @@ function output = fp_04_knn_euclidean(allDataTrainProperties, singleDataTesPrope
             
         tmp = power(singleDataTesProperty-allDataTrainProperties{i},2);  
         sum_tmp = sum(tmp);
-%         for j=1:3
-%             tmp = power(singleDataTesProperty(j).Contrast-allDataTrainProperties{i}(j).Contrast, 2);
-%             sum = sum + tmp;
-% 
-%             tmp = power(singleDataTesProperty(j).Correlation-allDataTrainProperties{i}(j).Correlation, 2);
-%             sum = sum + tmp;
-% 
-%             tmp = power(singleDataTesProperty(j).Energy-allDataTrainProperties{i}(j).Energy, 2);
-%             sum = sum + tmp;
-% 
-%             tmp = power(singleDataTesProperty(j).Homogeneity-allDataTrainProperties{i}(j).Homogeneity, 2);
-%             sum = sum + tmp;
-%         end
         distance = [distance sqrt(sum_tmp)];
     end
 

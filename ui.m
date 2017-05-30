@@ -104,10 +104,13 @@ function klasifikasi_Callback(hObject, eventdata, handles)
 global filename k im;
 global dtrainIdentity dtrainName dtrainDir dtrainNoSegmentGCH dtrainSegmentGCH;
 ix=1;
+im_segment = fp_01_segmentation(im);
+im_segment_gch=fp_gch(im_segment);
+im_no_segment = fp_gch(im);
+
 temp2=strsplit(filename,'_');
 temp2=temp2{1};
-im_segment=fp_gch(fp_01_segmentation(im));
-im = fp_gch(im);
+
 for i=1:5
     temp=strsplit(dtrainName{k*i},'_');
     temp=temp{1};
@@ -116,51 +119,75 @@ for i=1:5
         ix=dtrainIdentity(k*i);
     end
 end
-temp = fp_04_knn_canberra(dtrainNoSegmentGCH, im, k);
+
+temp = fp_04_knn_canberra(dtrainNoSegmentGCH, im_no_segment, k);
+x=[];
+y1=[];
+y2=[];
 clsPrediction = [];
 for j=1:length(temp)
     clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    y1=[y1 dtrainIdentity(temp(j))];
 end
 [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, ix);
-set(handles.klasifikasi_can,'String',num2str(prec));
-set(handles.klas_acc_can,'String',num2str(acc));
+% set(handles.klasifikasi_can,'String',num2str(prec));
+set(handles.klas_acc_can,'String',strcat(temp2,' : ',num2str(acc)));
 
 % Euclidean - GCH -Segment
-temp = fp_04_knn_euclidean(dtrainNoSegmentGCH, im, k);
+temp = fp_04_knn_euclidean(dtrainNoSegmentGCH, im_no_segment, k);
 clsPrediction = [];
 for j=1:length(temp)
+    x=[x j];
+    y2=[y2 dtrainIdentity(temp(j))];
     clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
 end
 [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, ix);
-set(handles.klasifikasi_euc,'String',num2str(prec));
-set(handles.klas_acc_euc,'String',num2str(acc));
+% set(handles.klasifikasi_euc,'String',num2str(prec));
+set(handles.klas_acc_euc,'String',strcat(temp2,' : ',num2str(acc)));
 
+axes(handles.axes4);
+imshow(im);
+title(strcat('real class : ',int2str(ix)));
+
+axes(handles.axes5);
+plot(x,y1,x,y2);
+legend('Canberra','Euclidean');
+% =================================================================
 
 %     % Segment - Canberra - GCH
-temp = fp_04_knn_canberra(dtrainSegmentGCH, im_segment, k);
+temp = fp_04_knn_canberra(dtrainSegmentGCH, im_segment_gch, k);
+x=[];
+y1=[];
+y2=[];
 clsPrediction = [];
 for j=1:length(temp)
     clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    y1=[y1 dtrainIdentity(temp(j))];
 end
 [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity),clsPrediction, ix);
-set(handles.klasifikasi_can_seg,'String',num2str(prec));
-set(handles.klas_acc_can_seg,'String',num2str(acc));
+% set(handles.klasifikasi_can_seg,'String',num2str(prec));
+set(handles.klas_acc_can_seg,'String',strcat(temp2,' : ',num2str(acc)));
 
 % Euclidean - GCH - Segment
-temp = fp_04_knn_euclidean(dtrainSegmentGCH, im_segment, k);
-k
-temp
-ix
+temp = fp_04_knn_euclidean(dtrainSegmentGCH, im_segment_gch, k);
 clsPrediction = [];
 for j=1:length(temp)
+    x=[x j];
+    y2=[y2 dtrainIdentity(temp(j))];
     clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
 end
-clsPrediction
 [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity),clsPrediction, ix);
-acc
-prec
-set(handles.klasifikasi_euc_seg,'String',num2str(prec));
-set(handles.klas_acc_euc_seg,'String',num2str(acc));
+% set(handles.klasifikasi_euc_seg,'String',num2str(prec));
+set(handles.klas_acc_euc_seg,'String',strcat(temp2,' : ',num2str(acc)));
+
+axes(handles.axes2);
+imshow(im_segment), 
+title(strcat('real class : ',int2str(ix)));
+
+axes(handles.axes3);
+plot(x,y1,x,y2);
+legend('Canberra','Euclidean');
+
 
 
 
