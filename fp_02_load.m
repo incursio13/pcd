@@ -34,7 +34,7 @@ function [classCount, classIdentity, classImage, imageDir, imageName] = fp_02_lo
                     imageName = [imageName ifiles(j).name];
 
                     img = imread(imdir);
-%                     img = imresize(img,[300 300]);
+%                     img = imresize(img,[500 500]);
                     classImage = [classImage img];
 
                     classIdentity = [classIdentity i-dirnum];

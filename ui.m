@@ -22,7 +22,7 @@ function varargout = ui(varargin)
 
 % Edit the above text to modify the response to help ui
 
-% Last Modified by GUIDE v2.5 21-Dec-2016 22:44:38
+% Last Modified by GUIDE v2.5 30-May-2017 04:50:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% Update handles structure
 % UIWAIT makes ui wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -80,8 +81,8 @@ function insert_gambar_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 axes(handles.axes1)
 global im
-global nama_file
-[filename, pathname] = uigetfile({'*.png;','PNG File';'*.*','All Files' },'mytitle');
+global nama_file pathname filename
+[filename, pathname] = uigetfile({'*.jpg;','JPG File';'*.*','All Files' },'mytitle');
 %[path,user_cance]=imgetfile();
 
 if strcmp(int2str(filename),'0')~=1
@@ -100,421 +101,67 @@ set(handles.klasifikasi,'Enable','on');
 
 % --- Executes on button press in klasifikasi.
 function klasifikasi_Callback(hObject, eventdata, handles)
-global nama_file dtestName dtrainName;
-global dtrainClassImage dtrainSegmentImage;
-global idx_class_can_pixel idx_class_can_GLCM idx_class_euc_pixel idx_class_euc_GLCM;
-global idx_segment_can_pixel idx_segment_can_GLCM idx_segment_euc_pixel idx_segment_euc_GLCM;
-global pr_class_can_GLCM pr_class_can_pixel pr_class_euc_GLCM pr_class_euc_pixel;
-global pr_segment_can_GLCM pr_segment_can_pixel pr_segment_euc_GLCM pr_segment_euc_pixel;
+global filename k im;
+global dtrainIdentity dtrainName dtrainDir dtrainNoSegmentGCH dtrainSegmentGCH;
+ix=1;
+temp2=strsplit(filename,'_');
+temp2=temp2{1};
+im_segment=fp_gch(fp_01_segmentation(im));
+im = fp_gch(im);
+for i=1:5
+    temp=strsplit(dtrainName{k*i},'_');
+    temp=temp{1};
 
-id=0;
-for i=1:length(dtestName)
-   if strcmp(dtestName{i},nama_file)==1;
-       id=i;
-   end
-end
-
-if get(handles.segmentasi,'Value')==1 && get(handles.euclidean,'Value')==1
-   axes(handles.axes2);
-   imshow(dtrainSegmentImage{idx_segment_euc_pixel{id}(1)});
-   title(strrep(dtrainName{idx_segment_euc_pixel{id}(1)},'_','\_'));
-   axes(handles.axes3);
-   imshow(dtrainSegmentImage{idx_segment_euc_pixel{id}(2)});
-   title(strrep(dtrainName{idx_segment_euc_pixel{id}(2)},'_','\_'));
-   axes(handles.axes4);
-   imshow(dtrainSegmentImage{idx_segment_euc_pixel{id}(3)});
-   title(strrep(dtrainName{idx_segment_euc_pixel{id}(3)},'_','\_'));
-   axes(handles.axes5);
-   imshow(dtrainSegmentImage{idx_segment_euc_pixel{id}(4)});
-   title(strrep(dtrainName{idx_segment_euc_pixel{id}(4)},'_','\_'));
-   axes(handles.axes6);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(5)});
-   title(strrep(dtrainName{idx_segment_euc_pixel{id}(5)},'_','\_'));
-   set(handles.presisi_pixel,'String',num2str(pr_segment_euc_pixel{id}(1)));
-elseif get(handles.segmentasi,'Value')==1 && get(handles.canberra,'Value')==1
-   axes(handles.axes2);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(1)});
-   title(strrep(dtrainName{idx_segment_can_pixel{id}(1)},'_','\_'));
-   axes(handles.axes3);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(2)});
-   title(strrep(dtrainName{idx_segment_can_pixel{id}(2)},'_','\_'));
-   axes(handles.axes4);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(3)});
-   title(strrep(dtrainName{idx_segment_can_pixel{id}(3)},'_','\_'));
-   axes(handles.axes5);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(4)});
-   title(strrep(dtrainName{idx_segment_can_pixel{id}(4)},'_','\_'));
-   axes(handles.axes6);
-   imshow(dtrainSegmentImage{idx_segment_can_pixel{id}(5)});
-   title(strrep(dtrainName{idx_segment_can_pixel{id}(5)},'_','\_'));
-   set(handles.presisi_pixel,'String',num2str(pr_segment_can_pixel{id}(1)));
-elseif get(handles.tanpa_segmentasi,'Value')==1 && get(handles.euclidean,'Value')==1
-   axes(handles.axes2);
-   imshow(dtrainClassImage{idx_class_euc_pixel{id}(1)});
-   title(strrep(dtrainName{idx_class_euc_pixel{id}(1)},'_','\_'));
-   axes(handles.axes3);
-   imshow(dtrainClassImage{idx_class_euc_pixel{id}(2)});
-   title(strrep(dtrainName{idx_class_euc_pixel{id}(2)},'_','\_'));
-   axes(handles.axes4);
-   imshow(dtrainClassImage{idx_class_euc_pixel{id}(3)});
-   title(strrep(dtrainName{idx_class_euc_pixel{id}(3)},'_','\_'));
-   axes(handles.axes5);
-   imshow(dtrainClassImage{idx_class_euc_pixel{id}(4)});
-   title(strrep(dtrainName{idx_class_euc_pixel{id}(4)},'_','\_'));
-   axes(handles.axes6);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(5)});
-   title(strrep(dtrainName{idx_class_euc_pixel{id}(5)},'_','\_'));
-   set(handles.presisi_pixel,'String',num2str(pr_class_euc_pixel{id}(1)));
-elseif get(handles.tanpa_segmentasi,'Value')==1 && get(handles.canberra,'Value')==1
-   axes(handles.axes2);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(1)});
-   title(strrep(dtrainName{idx_class_can_pixel{id}(1)},'_','\_'));
-   axes(handles.axes3);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(2)});
-   title(strrep(dtrainName{idx_class_can_pixel{id}(2)},'_','\_'));
-   axes(handles.axes4);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(3)});
-   title(strrep(dtrainName{idx_class_can_pixel{id}(3)},'_','\_'));
-   axes(handles.axes5);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(4)});
-   title(strrep(dtrainName{idx_class_can_pixel{id}(4)},'_','\_'));
-   axes(handles.axes6);
-   imshow(dtrainClassImage{idx_class_can_pixel{id}(5)});
-   title(strrep(dtrainName{idx_class_can_pixel{id}(5)},'_','\_'));
-   set(handles.presisi_pixel,'String',num2str(pr_class_can_pixel{id}(1)));
-end
-
-if get(handles.segmentasi,'Value')==1 && get(handles.euclidean,'Value')==1
-   axes(handles.axes7);
-   imshow(dtrainSegmentImage{idx_segment_euc_GLCM{id}(1)});
-   title(strrep(dtrainName{idx_segment_euc_GLCM{id}(1)},'_','\_'));
-   axes(handles.axes8);
-   imshow(dtrainSegmentImage{idx_segment_euc_GLCM{id}(2)});
-   title(strrep(dtrainName{idx_segment_euc_GLCM{id}(2)},'_','\_'));
-   axes(handles.axes9);
-   imshow(dtrainSegmentImage{idx_segment_euc_GLCM{id}(3)});
-   title(strrep(dtrainName{idx_segment_euc_GLCM{id}(3)},'_','\_'));
-   axes(handles.axes10);
-   imshow(dtrainSegmentImage{idx_segment_euc_GLCM{id}(4)});
-   title(strrep(dtrainName{idx_segment_euc_GLCM{id}(4)},'_','\_'));
-   axes(handles.axes11);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(5)});
-   title(strrep(dtrainName{idx_segment_euc_GLCM{id}(5)},'_','\_'));
-   set(handles.presisi_glcm,'String',num2str(pr_segment_euc_GLCM{id}(1)));
-elseif get(handles.segmentasi,'Value')==1 && get(handles.canberra,'Value')==1
-   axes(handles.axes7);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(1)});
-   title(strrep(dtrainName{idx_segment_can_GLCM{id}(1)},'_','\_'));
-   axes(handles.axes8);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(2)});
-   title(strrep(dtrainName{idx_segment_can_GLCM{id}(2)},'_','\_'));
-   axes(handles.axes9);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(3)});
-   title(strrep(dtrainName{idx_segment_can_GLCM{id}(3)},'_','\_'));
-   axes(handles.axes10);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(4)});
-   title(strrep(dtrainName{idx_segment_can_GLCM{id}(4)},'_','\_'));
-   axes(handles.axes11);
-   imshow(dtrainSegmentImage{idx_segment_can_GLCM{id}(5)});
-   title(strrep(dtrainName{idx_segment_can_GLCM{id}(5)},'_','\_'));
-   set(handles.presisi_glcm,'String',num2str(pr_segment_can_GLCM{id}(1)));
-elseif get(handles.tanpa_segmentasi,'Value')==1 && get(handles.euclidean,'Value')==1
-   axes(handles.axes7);
-   imshow(dtrainClassImage{idx_class_euc_GLCM{id}(1)});
-   title(strrep(dtrainName{idx_class_euc_GLCM{id}(1)},'_','\_'));
-   axes(handles.axes8);
-   imshow(dtrainClassImage{idx_class_euc_GLCM{id}(2)});
-   title(strrep(dtrainName{idx_class_euc_GLCM{id}(2)},'_','\_'));
-   axes(handles.axes9);
-   imshow(dtrainClassImage{idx_class_euc_GLCM{id}(3)});
-   title(strrep(dtrainName{idx_class_euc_GLCM{id}(3)},'_','\_'));
-   axes(handles.axes10);
-   imshow(dtrainClassImage{idx_class_euc_GLCM{id}(4)});
-   title(strrep(dtrainName{idx_class_euc_GLCM{id}(4)},'_','\_'));
-   axes(handles.axes11);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(5)});
-   title(strrep(dtrainName{idx_class_euc_GLCM{id}(5)},'_','\_'));
-   set(handles.presisi_glcm,'String',num2str(pr_class_euc_GLCM{id}(1)));
-elseif get(handles.tanpa_segmentasi,'Value')==1 && get(handles.canberra,'Value')==1
-   axes(handles.axes7);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(1)});
-   title(strrep(dtrainName{idx_class_can_GLCM{id}(1)},'_','\_'));
-   axes(handles.axes8);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(2)});
-   title(strrep(dtrainName{idx_class_can_GLCM{id}(2)},'_','\_'));
-   axes(handles.axes9);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(3)});
-   title(strrep(dtrainName{idx_class_can_GLCM{id}(3)},'_','\_'));
-   axes(handles.axes10);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(4)});
-   title(strrep(dtrainName{idx_class_can_GLCM{id}(4)},'_','\_'));
-   axes(handles.axes11);
-   imshow(dtrainClassImage{idx_class_can_GLCM{id}(5)});
-   title(strrep(dtrainName{idx_class_can_GLCM{id}(5)},'_','\_'));
-   set(handles.presisi_glcm,'String',num2str(pr_class_can_GLCM{id}(1)));
-end
-
-
-% --- Executes on button press in train.
-function train_Callback(hObject, eventdata, handles)
-% path = 'C:\Users\Arhy\Documents\viskom.fp\dataset\fixed\';
-global dtestName dtrainName;
-global dtrainClassImage dtrainSegmentImage;
-global idx_class_can_pixel idx_class_can_GLCM idx_class_euc_pixel idx_class_euc_GLCM;
-global idx_segment_can_pixel idx_segment_can_GLCM idx_segment_euc_pixel idx_segment_euc_GLCM;
-global pr_class_can_GLCM pr_class_can_pixel pr_class_euc_GLCM pr_class_euc_pixel;
-global pr_segment_can_GLCM pr_segment_can_pixel pr_segment_euc_GLCM pr_segment_euc_pixel;
-path = 'C:\Users\incr\Documents\viskom\dataset\';
-numOfTrain = 0.8;
-k = 5;
-
-% ===========================================================================
-
-% Load images.
-[classCount, classIdentity, classImage, imageDir, imageName] = fp_02_load(path);
-
-% Image segmentation.
-temp = {};
-for i=1:length(classImage)
-    temp = [temp fp_01_segmentation(classImage{i})];
-end
-
-segmentImage = temp;
-
-% ===========================================================================
-
-% Pixel properties.
-pixelClassProperties = cell(1,length(classCount));
-pixelSegmentProperties = cell(1,length(classCount));
-
-% Get glcm properties.
-glcmClassProperties = {};
-glcmSegmentProperties = {};
-for i=1:length(classImage)
-    glcmClassProperties = [glcmClassProperties fp_03_glcm(classImage{i})];
-    pixelClassProperties{i} = fp_08_RGB(classImage{i});
-    
-    glcmSegmentProperties = [glcmSegmentProperties fp_03_glcm(segmentImage{i})];
-    pixelSegmentProperties{i} = fp_08_RGB(segmentImage{i});
-end
-
-% ===========================================================================
-
-% Separate data train and data test.
-[dtrainIdentity, dtestIdentity] = fp_05_separate(classCount, classIdentity, numOfTrain);
-
-[dtrainClassImage, dtestClassImage] = fp_05_separate(classCount, classImage, numOfTrain);
-[dtrainSegmentImage, dtestSegmentImage] = fp_05_separate(classCount, segmentImage, numOfTrain);
-
-[dtrainName, dtestName] = fp_05_separate(classCount, imageName, numOfTrain);
-[dtrainDir, dtestDir] = fp_05_separate(classCount, imageDir, numOfTrain);
-
-[dtrainClassGLCM, dtestClassGLCM] = fp_05_separate(classCount, glcmClassProperties, numOfTrain);
-[dtrainClassPixel, dtestClassPixel] = fp_05_separate(classCount, pixelClassProperties, numOfTrain);
-
-[dtrainSegmentGLCM, dtestSegmentGLCM] = fp_05_separate(classCount, glcmSegmentProperties, numOfTrain);
-[dtrainSegmentPixel, dtestSegmentPixel] = fp_05_separate(classCount, pixelSegmentProperties, numOfTrain);
-
-% ===========================================================================
-
-% Trivia
-temp = dtrainIdentity;
-dtrainIdentity = [];
-for i=1:length(temp)
-    idx_class_can_pixel = temp{i};
-    for j=1:length(idx_class_can_pixel)
-        dtrainIdentity = [dtrainIdentity idx_class_can_pixel(j)];
+    if strcmp(temp, temp2)
+        ix=dtrainIdentity(k*i);
     end
 end
-
-temp = dtestIdentity;
-dtestIdentity = [];
-for i=1:length(temp)
-    idx_class_can_pixel = temp{i};
-    for j=1:length(idx_class_can_pixel)
-        dtestIdentity = [dtestIdentity idx_class_can_pixel(j)];
-    end
+temp = fp_04_knn_canberra(dtrainNoSegmentGCH, im, k);
+clsPrediction = [];
+for j=1:length(temp)
+    clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
 end
+[acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, ix);
+set(handles.klasifikasi_can,'String',num2str(prec));
+set(handles.klas_acc_can,'String',num2str(acc));
 
-clear classIdentity;
-clear classImage;
-clear imageName;
-clear imageDir;
-clear classProperties;
-clear sv;
-% ===========================================================================
-
-% KNN retrieval.
-% Pixel
-idx_class_can_pixel = {};
-idx_class_euc_pixel = {};
-    
-idx_segment_can_pixel = {};
-idx_segment_euc_pixel = {};
-
-pr_class_can_pixel = {};
-pr_class_euc_pixel = {};
-    
-pr_segment_can_pixel = {};
-pr_segment_euc_pixel = {};
-
-% GLCM
-
-idx_class_can_GLCM = {};
-idx_class_euc_GLCM = {};
-    
-idx_segment_can_GLCM = {};
-idx_segment_euc_GLCM = {};
-
-pr_class_can_GLCM = {};
-pr_class_euc_GLCM = {};
-    
-pr_segment_can_GLCM = {};
-pr_segment_euc_GLCM = {};
-
-for i=1:length(dtestClassPixel)
-    % ========================= Pixel ======================
-    % Class - Canberra - Pixel
-    temp = fp_04_knn_canberra(dtrainClassPixel, dtestClassPixel{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_class_can_pixel = [idx_class_can_pixel temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_class_can_pixel = [pr_class_can_pixel temp];
-    
-    % Class - Euclidean - Pixel
-    temp = fp_04_knn_euclidean(dtrainClassPixel, dtestClassPixel{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_class_euc_pixel= [idx_class_euc_pixel temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_class_euc_pixel = [pr_class_euc_pixel temp];
-    
-    % Segment - Canberra - Pixel
-    temp = fp_04_knn_canberra(dtrainSegmentPixel, dtestSegmentPixel{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_segment_can_pixel = [idx_segment_can_pixel temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_segment_can_pixel = [pr_segment_can_pixel temp];
-    
-    % Segment - Euclidean - Pixel
-    temp = fp_04_knn_euclidean(dtrainSegmentPixel, dtestSegmentPixel{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_segment_euc_pixel= [idx_segment_euc_pixel temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_segment_euc_pixel = [pr_segment_euc_pixel temp];
-    
-    % ========================= GLCM ======================
-    % Class - Canberra - Pixel
-    temp = fp_04_knn_canberra(dtrainClassGLCM, dtestClassGLCM{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_class_can_GLCM = [idx_class_can_GLCM temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_class_can_GLCM = [pr_class_can_GLCM temp];
-    
-    % Class - Euclidean - GLCM
-    temp = fp_04_knn_euclidean(dtrainClassGLCM, dtestClassGLCM{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_class_euc_GLCM= [idx_class_euc_GLCM temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_class_euc_GLCM = [pr_class_euc_GLCM temp];
-    
-    % Segment - Canberra - GLCM
-    temp = fp_04_knn_canberra(dtrainSegmentGLCM, dtestSegmentGLCM{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_segment_can_GLCM = [idx_segment_can_GLCM temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_segment_can_GLCM = [pr_segment_can_GLCM temp];
-    
-    % Segment - Euclidean - GLCM
-    temp = fp_04_knn_euclidean(dtrainSegmentGLCM, dtestSegmentGLCM{i}, k);
-    
-    clsPrediction = [];
-    for j=1:length(temp)
-        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
-    end
-    
-    idx_segment_euc_GLCM = [idx_segment_euc_GLCM temp];
-    [prec, rec] = fp_06_precision_recall(classCount, clsPrediction, dtestIdentity(i));
-    temp = [prec, rec];
-    pr_segment_euc_GLCM = [pr_segment_euc_GLCM temp];
+% Euclidean - GCH -Segment
+temp = fp_04_knn_euclidean(dtrainNoSegmentGCH, im, k);
+clsPrediction = [];
+for j=1:length(temp)
+    clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
 end
+[acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, ix);
+set(handles.klasifikasi_euc,'String',num2str(prec));
+set(handles.klas_acc_euc,'String',num2str(acc));
 
-avg_class_can_Pixel = 0.0;
-avg_class_can_GLCM = 0.0;
-avg_class_euc_Pixel = 0.0;
-avg_class_euc_GLCM = 0.0;
-avg_segment_can_Pixel = 0.0;
-avg_segment_can_GLCM = 0.0;
-avg_segment_euc_Pixel = 0.0;
-avg_segment_euc_GLCM = 0.0;
 
-for i=1:length(dtestDir)
-    avg_class_can_Pixel = avg_class_can_Pixel + pr_class_can_pixel{i}(1);
-    avg_class_can_GLCM = avg_class_can_GLCM + pr_class_can_GLCM{i}(1);
-    avg_class_euc_Pixel = avg_class_euc_Pixel + pr_class_euc_pixel{i}(1);
-    avg_class_euc_GLCM = avg_class_euc_GLCM + pr_class_euc_GLCM{i}(1);
-    
-    avg_segment_can_Pixel = avg_segment_can_Pixel + pr_segment_can_pixel{i}(1);
-    avg_segment_can_GLCM = avg_segment_can_GLCM + pr_segment_can_GLCM{i}(1);
-    avg_segment_euc_Pixel = avg_segment_euc_Pixel + pr_segment_euc_pixel{i}(1);
-    avg_segment_euc_GLCM = avg_segment_euc_GLCM + pr_segment_euc_GLCM{i}(1);
+%     % Segment - Canberra - GCH
+temp = fp_04_knn_canberra(dtrainSegmentGCH, im_segment, k);
+clsPrediction = [];
+for j=1:length(temp)
+    clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
 end
+[acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity),clsPrediction, ix);
+set(handles.klasifikasi_can_seg,'String',num2str(prec));
+set(handles.klas_acc_can_seg,'String',num2str(acc));
 
-avg_class_can_Pixel = avg_class_can_Pixel / double(length(dtestDir));
-avg_class_can_GLCM = avg_class_can_GLCM / double(length(dtestDir));
-avg_class_euc_Pixel = avg_class_euc_Pixel / double(length(dtestDir));
-avg_class_euc_GLCM = avg_class_euc_GLCM / double(length(dtestDir));
+% Euclidean - GCH - Segment
+temp = fp_04_knn_euclidean(dtrainSegmentGCH, im_segment, k);
+k
+temp
+ix
+clsPrediction = [];
+for j=1:length(temp)
+    clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+end
+clsPrediction
+[acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity),clsPrediction, ix);
+acc
+prec
+set(handles.klasifikasi_euc_seg,'String',num2str(prec));
+set(handles.klas_acc_euc_seg,'String',num2str(acc));
 
-avg_segment_can_Pixel = avg_segment_can_Pixel / double(length(dtestDir));
-avg_segment_can_GLCM = avg_segment_can_GLCM / double(length(dtestDir));
-avg_segment_euc_Pixel = avg_segment_euc_Pixel / double(length(dtestDir));
-avg_segment_euc_GLCM = avg_segment_euc_GLCM / double(length(dtestDir));
-
-clear i; clear j; clear prec; clear rec; clear temp;
-clear clsPrediction;
-set(handles.insert_gambar,'Enable','on');
-% set(handles.train,'Enable','off');
 
 
 % --- Executes on button press in segmentasi.
@@ -535,7 +182,6 @@ function euclidean_Callback(hObject, eventdata, handles)
 % hObject    handle to euclidean (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of euclidean
 
 
@@ -544,5 +190,202 @@ function canberra_Callback(hObject, eventdata, handles)
 % hObject    handle to canberra (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of canberra
+
+
+% --- Executes on button press in GetPerformance.
+function GetPerformance_Callback(hObject, eventdata, handles)
+set(handles.GetPerformance,'Enable','off');
+path = 'dataset/train/';
+numOfTrain = 0.83;
+
+% ===========================================================================
+% Load images.
+
+[classCount, classIdentity, classImage, imageDir, imageName] = fp_02_load(path);
+global k
+k = int8((numOfTrain)*classCount(1));
+
+% Image segmentation.
+temp = {};
+for i=1:length(classImage)
+    temp1 = fp_01_segmentation(classImage{i});
+    temp = [temp temp1];
+end
+
+segmentImage = temp;
+% for i=1:length(temp)
+%    figure, imshow(temp{i}); 
+% end
+
+% ===========================================================================
+% Get global color histogram.
+
+gch_no_segment = {};
+for i=1:length(classImage)
+    temp = fp_gch(classImage{i});
+    gch_no_segment = [gch_no_segment temp];
+end
+
+gch_segment = {};
+for i=1:length(classImage)
+    temp = fp_gch(segmentImage{i});
+    gch_segment = [gch_segment temp];
+end
+
+% ===========================================================================
+% Separate data train and data test.
+global dtrainIdentity dtrainName dtrainDir dtrainNoSegmentGCH dtrainSegmentGCH;
+[dtrainIdentity, dtestIdentity] = fp_05_separate(classCount, classIdentity, numOfTrain);
+
+[dtrainName, dtestName] = fp_05_separate(classCount, imageName, numOfTrain);
+[dtrainDir, dtestDir] = fp_05_separate(classCount, imageDir, numOfTrain);
+
+[dtrainNoSegmentGCH, dtestNoSegmentGCH] = fp_05_separate(classCount, gch_no_segment, numOfTrain);
+[dtrainSegmentGCH, dtestSegmentGCH] = fp_05_separate(classCount, gch_segment, numOfTrain);
+
+% ===========================================================================
+% Trivia
+
+temp = dtrainIdentity;
+dtrainIdentity = [];
+for i=1:length(temp)
+    idx_class_can_pixel = temp{i};
+    for j=1:length(idx_class_can_pixel)
+        dtrainIdentity = [dtrainIdentity idx_class_can_pixel(j)];
+    end
+end
+
+temp = dtestIdentity;
+dtestIdentity = [];
+for i=1:length(temp)
+    idx_class_can_pixel = temp{i};
+    for j=1:length(idx_class_can_pixel)
+        dtestIdentity = [dtestIdentity idx_class_can_pixel(j)];
+    end
+end
+
+clear classIdentity;
+% clear classImage;
+clear imageName;
+clear imageDir;
+clear classProperties;
+clear sv;
+
+% ===========================================================================
+% KNN retrieval.
+% GCH
+
+idx_can_GCH = {};
+idx_euc_GCH = {};
+idx_segment_can_GCH = {};
+idx_segment_euc_GCH = {};
+
+pr_can_GCH = {};
+pr_euc_GCH = {};   
+pr_segment_can_GCH = {};
+pr_segment_euc_GCH = {};
+
+for i=1:length(dtestNoSegmentGCH)
+    % ========================= GCH ======================
+    % Canberra - GCH - No Segment
+    temp = fp_04_knn_canberra(dtrainNoSegmentGCH, dtestNoSegmentGCH{i}, k);
+    
+    clsPrediction = [];
+    for j=1:length(temp)
+        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    end
+    
+    idx_can_GCH = [idx_can_GCH temp];
+    [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, dtestIdentity(i));
+    temp = [acc, prec, rec];
+    pr_can_GCH = [pr_can_GCH temp];
+    
+    % Euclidean - GCH - No Segment
+    temp = fp_04_knn_euclidean(dtrainNoSegmentGCH, dtestNoSegmentGCH{i}, k);
+    
+    clsPrediction = [];
+    for j=1:length(temp)
+        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    end
+    
+    idx_euc_GCH= [idx_euc_GCH temp];
+    [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, dtestIdentity(i));
+    temp = [acc, prec, rec];
+    pr_euc_GCH = [pr_euc_GCH temp];
+    
+%     % Segment - Canberra - GCH
+    temp = fp_04_knn_canberra(dtrainSegmentGCH, dtestSegmentGCH{i}, k);
+    
+    clsPrediction = [];
+    for j=1:length(temp)
+        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    end
+    
+    idx_segment_can_GCH = [idx_segment_can_GCH temp];
+    [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, dtestIdentity(i));
+    temp = [acc, prec, rec];
+    pr_segment_can_GCH = [pr_segment_can_GCH temp];
+    
+    % Euclidean - GCH - Segment
+    temp = fp_04_knn_euclidean(dtrainSegmentGCH, dtestSegmentGCH{i}, k);
+    
+    clsPrediction = [];
+    for j=1:length(temp)
+        clsPrediction = [clsPrediction dtrainIdentity(temp(j))];
+    end
+    
+    idx_segment_euc_GCH= [idx_segment_euc_GCH temp];
+    [acc, prec, rec] = fp_06_precision_recall(length(dtrainIdentity), clsPrediction, dtestIdentity(i));
+    temp = [acc, prec, rec];
+    pr_segment_euc_GCH = [pr_segment_euc_GCH temp];
+end
+
+% % ====================== Average ===============
+avg_acc_can = 0.0;
+avg_acc_euc = 0.0;
+avg_can_GCH = 0.0;
+avg_euc_GCH = 0.0;
+
+avg_segment_acc_can = 0.0;
+avg_segment_acc_euc = 0.0;
+avg_segment_can_GCH = 0.0;
+avg_segment_euc_GCH = 0.0;
+% % 
+for i=1:length(dtestDir)
+    avg_acc_can = avg_acc_can + pr_can_GCH{i}(1);
+    avg_acc_euc = avg_acc_euc + pr_euc_GCH{i}(1);
+    avg_can_GCH = avg_can_GCH + pr_can_GCH{i}(2);
+    avg_euc_GCH = avg_euc_GCH + pr_euc_GCH{i}(2);
+    
+    avg_segment_acc_can = avg_segment_acc_can + pr_segment_can_GCH{i}(1);
+    avg_segment_acc_euc = avg_segment_acc_euc + pr_segment_euc_GCH{i}(1);
+    avg_segment_can_GCH = avg_segment_can_GCH + pr_segment_can_GCH{i}(2);
+    avg_segment_euc_GCH = avg_segment_euc_GCH + pr_segment_euc_GCH{i}(2);
+end
+% 
+avg_acc_euc = avg_acc_euc / double(length(dtestDir));
+avg_acc_can = avg_acc_can / double(length(dtestDir));
+avg_can_GCH = avg_can_GCH / double(length(dtestDir));
+avg_euc_GCH = avg_euc_GCH / double(length(dtestDir));
+
+avg_segment_acc_can = avg_segment_acc_can / double(length(dtestDir));
+avg_segment_acc_euc = avg_segment_acc_euc / double(length(dtestDir));
+avg_segment_can_GCH = avg_segment_can_GCH / double(length(dtestDir));
+avg_segment_euc_GCH = avg_segment_euc_GCH / double(length(dtestDir));
+
+% ================ Trivia ==============
+clear i; clear j; clear prec; clear rec; clear temp; clear acc;
+% clear clsPrediction;
+% 
+% % Done.
+set(handles.insert_gambar,'Enable','on');
+set(handles.acc_canberra,'String',num2str(avg_acc_can));
+set(handles.acc_euclidean,'String',num2str(avg_acc_euc));
+set(handles.precision_canberra,'String',num2str(avg_can_GCH));
+set(handles.precision_euclidean,'String',num2str(avg_euc_GCH));
+
+set(handles.acc_canberra_segment,'String',num2str(avg_segment_acc_can));
+set(handles.acc_euclidean_segment,'String',num2str(avg_segment_acc_euc));
+set(handles.precision_canberra_segment,'String',num2str(avg_segment_can_GCH));
+set(handles.precision_euclidean_segment,'String',num2str(avg_segment_euc_GCH));

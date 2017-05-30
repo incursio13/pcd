@@ -1,4 +1,4 @@
-function [acc, precision, recall] = fp_06_confmatrix(count_train,classCount, classPrediction, classActual)
+function [acc, precision, recall] = fp_06_confmatrix(count_train, classPrediction, classActual)
     len = length(classPrediction);
     
     tp = 0.0;

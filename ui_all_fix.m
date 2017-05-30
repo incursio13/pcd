@@ -76,7 +76,7 @@ varargout{1} = handles.output;
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % path = 'C:\Users\Arhy\Documents\viskom.fp\dataset\fixed\';
-path = 'C:\Users\incr\Documents\viskom\dataset\';
+path = 'C:\Users\exod\Documents\MATLAB\viskom\dataset\';
 numOfTrain = 0.8;
 k = 5;
 
