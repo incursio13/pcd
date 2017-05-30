@@ -82,7 +82,7 @@ function insert_gambar_Callback(hObject, eventdata, handles)
 axes(handles.axes1)
 global im
 global nama_file pathname filename
-[filename, pathname] = uigetfile({'*.jpg;','JPG File';'*.*','All Files' },'mytitle');
+[filename, pathname] = uigetfile({'*.png;','PNG File';'*.jpg;','JPG File';'*.*','All Files' },'mytitle');
 %[path,user_cance]=imgetfile();
 
 if strcmp(int2str(filename),'0')~=1
